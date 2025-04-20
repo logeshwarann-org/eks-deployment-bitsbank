@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: bits-auth-svc
+  labels:
+    app: bits-auth-svc
+spec:
+  serviceName: bits-auth-svc-service 
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bits-auth-svc
+  template:
+    metadata:
+      labels:
+        app: bits-auth-svc
+    spec:
+      containers:
+      - name: bits-auth-svc
+        image: logeshwarann/bits-bank-auth:7643
+        env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: PLAID_SERVICE_CREATE_CUSTOMER_URL
+              value: http://bits-plaid-svc-service.default.svc.cluster.local:80/plaid/v1/dwolla/customer/create
+            - name: JWT_SECRET_KEY
+              value: BitsBank
+            - name: DB_USER
+              value: admin
+            - name: DB_PWD
+              value: admin@123
+            - name: DB_NAME
+              value: auth_db
+            - name: DB_HOST
+              value: postgres-auth-service.default.svc.cluster.local
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_SSL
+              value: disable
+            - name: REDIS_DB_ADDR
+              value: session-store-service
+            - name: REDIS_DB_PORT
+              value: "6379"
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bits-auth-svc-service
+spec:
+  selector:
+    app: bits-auth-svc
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080

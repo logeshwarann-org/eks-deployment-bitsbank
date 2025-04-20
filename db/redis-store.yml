@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: session-store
+spec:
+  serviceName: session-store 
+  replicas: 1
+  selector:
+    matchLabels:
+      app: session-store
+  template:
+    metadata:
+      labels:
+        app: session-store
+    spec:
+      containers:
+      - name: session-store
+        image: redis:alpine
+        ports:
+        - containerPort: 6379
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: session-store-service
+spec:
+  selector:
+    app: session-store
+  ports:
+  - protocol: TCP
+    port: 6379
+    targetPort: 6379
+  clusterIP: None 

@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-auth-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres-auth
+  template:
+    metadata:
+      labels:
+        app: postgres-auth
+    spec:
+      containers:
+      - name: postgres-auth
+        image: logeshwarann/postgres-service:bitsbank-authdb-01
+        ports:
+        - containerPort: 5432
+        env:
+          - name: POSTGRES_USER
+            value: "admin"
+          - name: POSTGRES_PASSWORD
+            value: "admin@123"
+        volumeMounts:
+        - name: postgres-auth-storage
+          mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: postgres-auth-storage
+          persistentVolumeClaim:
+            claimName: postgres-auth-pv-claim
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-auth-service
+spec:
+  type: ClusterIP
+  selector:
+    app: postgres-auth
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432

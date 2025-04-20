@@ -1,0 +1,36 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: backend-ingress
+  namespace: default
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/listen-ports:  '[{"HTTP": 80}, {"HTTPS":443}]'
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-south-1:481665107730:certificate/638bfe33-83eb-470c-ab6d-faf5f2f5ef09
+    alb.ingress.kubernetes.io/ssl-redirect: "443"
+    alb.ingress.kubernetes.io/target-type: ip
+spec:
+  ingressClassName: alb
+  rules:
+  - host: api.bitsbank-project.site
+    http:
+      paths:
+        - path: /auth
+          pathType: Prefix
+          backend:
+            service:
+              name: bits-auth-svc-service
+              port:
+                number: 80
+
+        - path: /plaid
+          pathType: Prefix
+          backend:
+            service:
+              name: bits-plaid-svc-service
+              port:
+                number: 80
+  tls:
+    - hosts:
+        - api.bitsbank-project.site
+      secretName: dummy-tls-secret

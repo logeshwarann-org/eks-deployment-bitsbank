@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: bits-plaid-svc
+  labels:
+    app: bits-plaid-svc
+spec:
+  serviceName: bits-plaid-svc-service 
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bits-plaid-svc
+  template:
+    metadata:
+      labels:
+        app: bits-plaid-svc
+    spec:
+      containers:
+      - name: bits-plaid-svc
+        image: logeshwarann/bits-bank-plaid:9687
+        env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: PLAID_CLIENT_ID
+              value: 67cd296f9771e700234db273
+            - name: PLAID_SECRET
+              value: 5538302e705630e1b916611500e165
+            - name: PLAID_ENV
+              value: sandbox
+            - name: PLAID_PRODUCTS
+              value: auth,transactions,identity
+            - name: COUNTRY_CODE
+              value: US,CA
+            - name: DWOLLA_KEY
+              value: 1IrClhUzMiaUXKcgrCz8KbRXzV132hjP4kzLmPKYxzALYyID0Z
+            - name: DWOLLA_SECRET
+              value: c6YG2vo2B8erMmO0s9zEjNW55I2m7ZHORRq93L7vPu0fwuP0Am
+            - name: DWOLLA_BASE_URL
+              value: https://api-sandbox.dwolla.com
+            - name: DB_USER
+              value: admin
+            - name: DB_PWD
+              value: admin@123
+            - name: DB_NAME
+              value: bank_db
+            - name: DB_HOST
+              value: postgres-plaid-service.default.svc.cluster.local
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_SSL
+              value: disable
+            - name: REDIS_DB_ADDR
+              value: session-store-service
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8090
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bits-plaid-svc-service
+spec:
+  selector:
+    app: bits-plaid-svc
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8090

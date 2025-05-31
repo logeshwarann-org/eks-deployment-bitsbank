@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: bits-auth-svc
-        image: logeshwarann/bits-bank-auth:7643
+        image: logeshwarann/bits-bank-auth:2004.1825
         env:
             - name: POD_NAME
               valueFrom:

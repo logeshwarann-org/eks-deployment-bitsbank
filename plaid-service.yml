@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: bits-plaid-svc
-        image: logeshwarann/bits-bank-plaid:9687
+        image: logeshwarann/bits-bank-plaid:2004.1826
         env:
             - name: POD_NAME
               valueFrom:

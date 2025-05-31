@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: postgres-auth
-        image: logeshwarann/postgres-service:bitsbank-authdb-01
+        image: logeshwarann/postgres-service:bitsbank-authdb-02
         ports:
         - containerPort: 5432
         env:

@@ -29,7 +29,7 @@ sudo mv /tmp/eksctl /usr/local/bin
 
 ## ☁️ 2. Create EKS Cluster
 ```bash
-eksctl create cluster --name bits-bank-cluster --region ap-south-1 --nodes 2 --managed
+eksctl create cluster --name bits-bank-cluster --region ap-south-1 --nodes 3 --node-type t3.micro --managed
 ```
 
 Verify:
@@ -48,7 +48,7 @@ eksctl delete cluster --name bits-bank-cluster
 
 ## 🔐 4. Set Up IAM OIDC Provider
 ```bash
-eksctl utils associate-iam-oidc-provider --region=ap-south-1 --cluster=bits-bank-cluster
+eksctl utils associate-iam-oidc-provider --region=ap-south-1 --cluster=bits-bank-cluster --approve
 ```
 
 ---
@@ -78,7 +78,7 @@ helm install aws-load-balancer-controller eks/aws-load-balancer-controller \
   --set serviceAccount.create=false \
   --set serviceAccount.name=alb-ingress-controller \
   --set region=ap-south-1 \
-  --set vpcId=vpc-0bdcddcc22de2362a \
+  --set vpcId=vpc-0a9d05516b2de00de \
   --set ingressClass=alb
 ```
 
@@ -109,10 +109,13 @@ kubectl port-forward -n kubernetes-dashboard service/kubernetes-dashboard-kong-p
 ```bash
 eksctl scale nodegroup \
   --cluster bits-bank-cluster \
-  --name ng-7ac5c3c9 \
-  --nodes 6 \
-  --nodes-min 5 \
-  --nodes-max 8
+  --name <node-group> \
+  --nodes 10 \
+  --nodes-min 8 \
+  --nodes-max 12
+```
+```bash
+eksctl get nodegroup --cluster bits-bank-cluster --region ap-south-1 --name ng-0de9252c
 ```
 
 List nodes:
